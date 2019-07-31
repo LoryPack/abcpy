@@ -16,6 +16,6 @@
   import_array();
 %}
 
-%apply (int* ARGOUT_ARRAY1, int DIM1) {(int* result, unsigned int rsize)};
+%apply (int* ARGOUT_ARRAY1, int DIM1) {(int* result, int rsize)};
 
 extern void model( int* result, int rsize, MPI_Comm communicator, double mean, double stddev, int seed);

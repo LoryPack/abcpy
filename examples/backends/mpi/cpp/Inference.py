@@ -48,6 +48,10 @@ class Normal(ProbabilisticModel):
             mean = input_values[0]
             stddev = input_values[1]
             # run the model
+            print(mpi_comm)
+            mpi_comm = MPI.COMM_WORLD
+            print(mpi_comm)
+            print("will call the model")
             res = model(self.get_output_dimension(), mpi_comm, mean, stddev, seed)  
             # model outputs valid values only on rank 0  
             if mpi_comm.Get_rank() == 0:
@@ -94,7 +98,9 @@ def infer_parameters():
     # define the model
     normal_model = Normal([mean, stddev])
 
-    fake_obs = normal_model.forward_simulate([0, 1], 1)
+    print("Will call forward simulate")
+
+    fake_obs = normal_model.forward_simulate([2.0, 5.0], 1)
 
     print(fake_obs)
 
@@ -114,10 +120,12 @@ def infer_parameters():
     #return journal
     return fake_obs
 
+print("Hello from rank ", MPI.COMM_WORLD.Get_rank())
+
 parser = argparse.ArgumentParser()
 parser.add_argument("npm", help="number of mpi process per model", type=int)
 args = parser.parse_args()
 if args.npm >=MPI.COMM_WORLD.Get_size():
     raise "number of process per model must be lower than number of MPI process (one process is dedicated to the scheduler)"
-setup_backend(args.npm)
+#setup_backend(args.npm)
 print(infer_parameters())
