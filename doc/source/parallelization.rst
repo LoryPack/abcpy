@@ -17,7 +17,7 @@ To run ABCpy in parallel using MPI, one only needs to use the provided MPI
 backend. Using the same example as before, the statements for the backend have to
 be changed to
 
-.. literalinclude:: ../../examples/backends/mpi/pmcabc_gaussian.py
+.. literalinclude:: ../../examples/backends/mpi/python/pmcabc_gaussian.py
     :language: python
     :lines: 6-10
     :dedent: 4
@@ -58,7 +58,7 @@ communicators for each forward model. The number of ranks per communicator
 (defined as: `process_per_model`)
 can be passed at the initialization of the backend as follows:
 
-.. literalinclude:: ../../examples/backends/mpi/mpi_model_inferences.py
+.. literalinclude:: ../../examples/backends/mpi/python/mpi_model_inferences.py
     :language: python
     :lines: 10-11
     :dedent: 4
@@ -76,7 +76,7 @@ An example of an MPI-parallelized simulator model, which can be used with ABCpy
 nested-parallelization, can be found in `examples/backend/mpi/mpi_model_inferences.py`.
 The `forward_simulation` function of the above model is as follows:
 
-.. literalinclude:: ../../examples/backends/mpi/mpi_model_inferences.py
+.. literalinclude:: ../../examples/backends/mpi/python/mpi_model_inferences.py
     :language: python
     :lines: 48-77
     :dedent: 4
