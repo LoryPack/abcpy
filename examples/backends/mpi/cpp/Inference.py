@@ -94,20 +94,25 @@ def infer_parameters():
     # define the model
     normal_model = Normal([mean, stddev])
 
-    y_obs = [17, 54, 75, 161, 187, 202, 140, 87, 44, 17]
+    fake_obs = normal_model.forward_simulate([0, 1], 1)
+
+    print(fake_obs)
+
+    #y_obs = [17, 54, 75, 161, 187, 202, 140, 87, 44, 17]
 
     # define distance
-    distance_calculator = Distance()
+    #distance_calculator = Distance()
 
     # define sampling scheme
-    from abcpy.inferences import APMCABC
-    sampler = APMCABC([normal_model], [distance_calculator], backend, seed=1)
-    print('Sampling')
-    T, n_samples = 1, 2
-    eps_arr = np.array([10000])
-    journal = sampler.sample(y_obs, T, eps_arr, n_samples)
+    #from abcpy.inferences import APMCABC
+    #sampler = APMCABC([normal_model], [distance_calculator], backend, seed=1)
+    #print('Sampling')
+    #T, n_samples = 1, 2
+    #eps_arr = np.array([10000])
+    #journal = sampler.sample(y_obs, T, eps_arr, n_samples)
 
-    return journal
+    #return journal
+    return fake_obs
 
 parser = argparse.ArgumentParser()
 parser.add_argument("npm", help="number of mpi process per model", type=int)
