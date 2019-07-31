@@ -330,7 +330,7 @@ if __name__ == "__main__":
     print('Posterior Mean of PMCABC: ' + str(infer_parameters_pmcabc().posterior_mean()))
     print('Posterior Mean of ABCsubsim: ' + str(infer_parameters_abcsubsim().posterior_mean()))
     print('Posterior Mean of RSMCABC: ' + str(infer_parameters_rsmcabc().posterior_mean()))
-    print('Posterior Mean of SABC: ' + str(infer_parameters_sabc().posterior_mean()))
+    # print('Posterior Mean of SABC: ' + str(infer_parameters_sabc().posterior_mean()))
     print('Posterior Mean of SMCABC: ' + str(infer_parameters_smcabc().posterior_mean()))
     print('Posterior Mean of APMCABC: ' + str(infer_parameters_apmcabc().posterior_mean()))
     print('Posterior Mean of RejectionABC: ' + str(infer_parameters_rejectionabc().posterior_mean()))

@@ -1,7 +1,6 @@
 import numpy as np
 from model import model
 from abcpy.probabilisticmodels import ProbabilisticModel, InputConnector
-import argparse
 from mpi4py import MPI
 
 def meanr(measures, compute):
@@ -47,6 +46,7 @@ class Normal(ProbabilisticModel):
             seed = rng.randint(np.iinfo(np.int32).max)
             mean = input_values[0]
             stddev = input_values[1]
+            mpi_comm = MPI.COMM_WORLD
             res = model(self.get_output_dimension(), mpi_comm, mean, stddev, seed)
             # model outputs valid values only on rank 0  
             if mpi_comm.Get_rank() == 0:
@@ -58,60 +58,14 @@ class Normal(ProbabilisticModel):
         result = mpi_comm.bcast(result)
         return result
 
-class Distance():
-
-    # distance between output vectors
-    def distance(self, s1, s2):
-        if not isinstance(s1, list):
-            raise TypeError('Data is not of allowed types, should be a list')
-        if not isinstance(s2, list):
-            raise TypeError('Data is not of allowed types, should be a list')
-
-        # compute distance between the statistics
-        dist = np.zeros(shape=(s1.shape[0],s2.shape[0]))
-        for ind1 in range(0, s1.shape[0]):
-            for ind2 in range(0, s2.shape[0]):
-                dist[ind1,ind2] = meanr(s1[ind1,:], s2[ind2,:])
-
-        return dist.mean()
-
-    def dist_max(self):
-        return np.inf
-
-def setup_backend(process_per_model):
-    global backend
-    from abcpy.backends import BackendMPI as Backend
-    backend = Backend(process_per_model=process_per_model)
+# define the model
+from abcpy.continuousmodels import Uniform
+mean = Uniform([[1], [10]], )
+stddev = Uniform([[0], [4]], )
+normal_model = Normal([mean, stddev])
+fake_obs = normal_model.forward_simulate([5.0, 2.0], 1)
+if MPI.COMM_WORLD.Get_rank()==0:
+    print(fake_obs)
 
 
-def infer_parameters():
 
-    from abcpy.continuousmodels import Uniform
-    mean = Uniform([[1], [10]], )
-    stddev = Uniform([[0], [4]], )
-
-    # define the model
-    normal_model = Normal([mean, stddev])
-
-    y_obs = [np.array([17, 54, 75, 161, 187, 202, 140, 87, 44, 17]).reshape(-1, )]
-
-    # define distance
-    distance_calculator = Distance()
-
-    # define sampling scheme
-    from abcpy.inferences import APMCABC
-    sampler = APMCABC([normal_model], [distance_calculator], backend, seed=1)
-    print('Sampling')
-    steps, n_samples, n_samples_per_param, alpha, acceptance_cutoff, covFactor, full_output, journal_file = 1, 2, 1, 0.1, 0.03, 2.0, 1, None
-    journal = sampler.sample([y_obs], steps, n_samples, n_samples_per_param, alpha, acceptance_cutoff, covFactor, full_output, journal_file)
-
-    return journal
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument("npm", help="number of mpi process per model", type=int)
-args = parser.parse_args()
-if args.npm >=MPI.COMM_WORLD.Get_size():
-    raise "number of process per model must be lower than number of MPI process (one process is dedicated to the scheduler)"
-setup_backend(args.npm)
-print(infer_parameters())
