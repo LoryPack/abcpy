@@ -48,13 +48,13 @@ class Normal(ProbabilisticModel):
             mean = input_values[0]
             stddev = input_values[1]
             # run the model
-            res = model(self.get_output_dimension(), mean, stddev, seed)  
+            res = model(self.get_output_dimension(), mpi_comm, mean, stddev, seed)  
             # model outputs valid values only on rank 0  
             if mpi_comm.Get_rank() == 0:
                 results.append(res)
         # reshape the results and broadcast them to all rank
         result = None
-        if rank==0:
+        if mpi_comm.Get_rank()==0:
             result = [np.array([results[i]]).reshape(-1,) for i in range(k)]
         result = mpi_comm.bcast(result)
         return result
