@@ -30,15 +30,15 @@ class Normal(ProbabilisticModel):
         return True
 
     def _check_output(self, values):
-        if not isinstance(values, np.ndarray):
-            raise ValueError('Output of the model should be a numpy array')
+        #if not isinstance(values, np.ndarray):
+        #    raise ValueError('Output of the model should be a numpy array')
 
-        if values.shape[0] != 10:
-            raise ValueError('Output shape should be of dimension 10')
+        #if values.shape[0] != 10:
+        #    raise ValueError('Output shape should be of dimension 10')
         return True
 
     def get_output_dimension(self):
-        return 10
+        return 1
 
     def forward_simulate(self, input_values, k, rng=np.random.RandomState(), mpi_comm=None):
         # do i k times
@@ -48,8 +48,8 @@ class Normal(ProbabilisticModel):
             mean = input_values[0]
             stddev = input_values[1]
             # run the model
-            print(mpi_comm)
-            mpi_comm = MPI.COMM_WORLD
+            #print(mpi_comm)
+            #mpi_comm = MPI.COMM_WORLD
             print(mpi_comm)
             print("will call the model")
             res = model(self.get_output_dimension(), mpi_comm, mean, stddev, seed)  
@@ -92,40 +92,37 @@ def setup_backend(process_per_model):
 def infer_parameters():
 
     from abcpy.continuousmodels import Uniform
-    mean = Uniform([[1], [10]], )
-    stddev = Uniform([[0], [4]], )
+    mean = Uniform([[1], [10]], 'mean')
+    stddev = Uniform([[0], [4]], 'stdev')
 
     # define the model
     normal_model = Normal([mean, stddev])
 
     print("Will call forward simulate")
 
-    fake_obs = normal_model.forward_simulate([2.0, 5.0], 1)
 
-    print(fake_obs)
-
-    #y_obs = [17, 54, 75, 161, 187, 202, 140, 87, 44, 17]
+    y_obs = [17, 54, 75, 161, 187, 202, 140, 87, 44, 17]
 
     # define distance
-    #distance_calculator = Distance()
+    distance_calculator = Distance()
 
     # define sampling scheme
-    #from abcpy.inferences import APMCABC
-    #sampler = APMCABC([normal_model], [distance_calculator], backend, seed=1)
-    #print('Sampling')
-    #T, n_samples = 1, 2
-    #eps_arr = np.array([10000])
-    #journal = sampler.sample(y_obs, T, eps_arr, n_samples)
+    from abcpy.inferences import APMCABC
+    sampler = APMCABC([normal_model], [distance_calculator], backend, seed=1)
+    print('Sampling')
+    T, n_samples = 1, 20
+    eps_arr = np.array([10000])
+    journal = sampler.sample(y_obs, T, eps_arr, n_samples)
 
-    #return journal
-    return fake_obs
+    return journal
 
 print("Hello from rank ", MPI.COMM_WORLD.Get_rank())
 
 parser = argparse.ArgumentParser()
 parser.add_argument("npm", help="number of mpi process per model", type=int)
 args = parser.parse_args()
+print(args.npm)
 if args.npm >=MPI.COMM_WORLD.Get_size():
     raise "number of process per model must be lower than number of MPI process (one process is dedicated to the scheduler)"
-#setup_backend(args.npm)
+setup_backend(args.npm)
 print(infer_parameters())

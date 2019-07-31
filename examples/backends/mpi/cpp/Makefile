@@ -4,7 +4,7 @@ WGET=wget -q
 
 CC=mpiCC
 CPPFLAGS=-fPIC -O3
-INCLUDEPATH=/usr/include/python3.6
+INCLUDEPATH=/usr/include/python3.7
 
 all: cpp model
 
