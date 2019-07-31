@@ -38,7 +38,7 @@ exampletest: $(MAKEDIRS)
 
 exampletest_mpi:
 	echo "Testing MPI backend examples.."
-	mpirun -np 2 python3 -m unittest -v examples/backends/mpi/pmcabc_gaussian.py || (echo "Error in MPI example tests."; exit 1)
+	mpirun -np 2 python3 -m unittest -v examples/backends/mpi/python/pmcabc_gaussian.py || (echo "Error in MPI example tests."; exit 1)
 
 doctest:
 	make -C doc html || (echo "Error in documentation generator."; exit 1)
