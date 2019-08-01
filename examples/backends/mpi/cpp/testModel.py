@@ -29,15 +29,15 @@ class Normal(ProbabilisticModel):
         return True
 
     def _check_output(self, values):
-        if not isinstance(values, np.ndarray):
-            raise ValueError('Output of the model should be a numpy array')
-
-        if values.shape[0] != 10:
-            raise ValueError('Output shape should be of dimension 10')
+        # if not isinstance(values, np.ndarray):
+        #     raise ValueError('Output of the model should be a numpy array')
+        #
+        # if values.shape[0] != 10:
+        #     raise ValueError('Output shape should be of dimension 10')
         return True
 
     def get_output_dimension(self):
-        return 10
+        return 1
 
     def forward_simulate(self, input_values, k, rng=np.random.RandomState(), mpi_comm=None):
         # do i k times
