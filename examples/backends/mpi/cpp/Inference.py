@@ -53,9 +53,10 @@ class Normal(ProbabilisticModel):
             print(mpi_comm)
             print("will call the model")
             res = model(self.get_output_dimension(), mpi_comm, mean, stddev, seed)  
+
             # model outputs valid values only on rank 0  
             if mpi_comm.Get_rank() == 0:
-                results.append(res)
+                results.append(np.array(res))
         # reshape the results and broadcast them to all rank
         result = None
         if mpi_comm.Get_rank()==0:
@@ -100,8 +101,7 @@ def infer_parameters():
 
     print("Will call forward simulate")
 
-
-    y_obs = [17, 54, 75, 161, 187, 202, 140, 87, 44, 17]
+    y_obs = [np.array([17, 54, 75, 161, 187, 202, 140, 87, 44, 17]).reshape(-1, )]
 
     # define distance
     distance_calculator = Distance()
@@ -110,13 +110,11 @@ def infer_parameters():
     from abcpy.inferences import APMCABC
     sampler = APMCABC([normal_model], [distance_calculator], backend, seed=1)
     print('Sampling')
-    T, n_samples = 1, 20
-    eps_arr = np.array([10000])
-    journal = sampler.sample(y_obs, T, eps_arr, n_samples)
+    steps, n_samples, n_samples_per_param, alpha, acceptance_cutoff, covFactor, full_output, journal_file = 1, 2, 1, 0.1, 0.03, 2.0, 1, None
+    journal = sampler.sample([y_obs], steps, n_samples, n_samples_per_param, alpha, acceptance_cutoff, covFactor, full_output, journal_file)
 
     return journal
 
-print("Hello from rank ", MPI.COMM_WORLD.Get_rank())
 
 parser = argparse.ArgumentParser()
 parser.add_argument("npm", help="number of mpi process per model", type=int)

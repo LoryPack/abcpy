@@ -20,7 +20,7 @@ cpp: _model.so model.py
 	$(SWIG) $(SWIGFLAGS) -o $@ $<
 
 %.o: %.cpp
-	$(CC) $(CPPFLAGS) -I $(INCLUDEPATH) -I /usr/local/lib/python3.6/dist-packages/mpi4py/include/ -I /usr/local/lib/python3.6/dist-packages/numpy/core/include/ -c $< -o $@
+	$(CC) $(CPPFLAGS) -I $(INCLUDEPATH) -c $< -o $@
 
 _%.so: %.o %_wrap.o
 	$(CC) -shared $^ -o $@
