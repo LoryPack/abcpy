@@ -293,6 +293,26 @@ class SABCTests(unittest.TestCase):
 
         self.assertFalse(journal.number_of_simulations == 0)
 
+    def test_restart_from_journal(self):
+        # THIS DOES NOT WORK
+        epsilon, n_samples, n_samples_per_param = 10, 10, 1
+
+        # 2 steps with intermediate journal:
+        sampler = SABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_intermediate = sampler.sample([self.observation], 1, epsilon, n_samples, n_samples_per_param)
+        journal_intermediate.save("tmp.jnl")
+        journal_final_1 = sampler.sample([self.observation], 1, epsilon, n_samples, n_samples_per_param,
+                                         journal_file="tmp.jnl")
+
+        # 2 steps directly
+        sampler = SABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_final_2 = sampler.sample([self.observation], 2, epsilon, n_samples, n_samples_per_param)
+
+        self.assertEqual(journal_final_1.configuration["epsilon_arr"], journal_final_2.configuration["epsilon_arr"])
+        self.assertEqual(journal_final_1.posterior_mean()['mu'], journal_final_2.posterior_mean()['mu'])
+
 
 class ABCsubsimTests(unittest.TestCase):
     def setUp(self):
@@ -421,6 +441,26 @@ class SMCABCTests(unittest.TestCase):
 
         self.assertFalse(journal.number_of_simulations == 0)
 
+    def test_restart_from_journal(self):
+        # THIS DOES NOT WORK
+        n_sample, n_simulate = 10, 1
+
+        # 2 steps with intermediate journal:
+        sampler = SMCABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_intermediate = sampler.sample([self.observation], 1, n_sample, n_simulate)
+        journal_intermediate.save("tmp.jnl")
+        journal_final_1 = sampler.sample([self.observation], 1, n_sample, n_simulate,
+                                         journal_file="tmp.jnl")
+
+        # 2 steps directly
+        sampler = SMCABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_final_2 = sampler.sample([self.observation], 2, n_sample, n_simulate)
+
+        self.assertEqual(journal_final_1.configuration["epsilon_arr"], journal_final_2.configuration["epsilon_arr"])
+        self.assertEqual(journal_final_1.posterior_mean()['mu'], journal_final_2.posterior_mean()['mu'])
+
 
 class APMCABCTests(unittest.TestCase):
     def setUp(self):
@@ -483,6 +523,26 @@ class APMCABCTests(unittest.TestCase):
         self.assertLess(sigma_post_mean - 6.451434816944525, 10e-2)
 
         self.assertFalse(journal.number_of_simulations == 0)
+
+    def test_restart_from_journal(self):
+        # THIS DOES NOT WORK
+        n_sample, n_simulate = 10, 1
+
+        # 2 steps with intermediate journal:
+        sampler = APMCABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_intermediate = sampler.sample([self.observation], 1, n_sample, n_simulate, alpha=0.9)
+        journal_intermediate.save("tmp.jnl")
+        journal_final_1 = sampler.sample([self.observation], 1, n_sample, n_simulate, alpha=0.9,
+                                         journal_file="tmp.jnl")
+
+        # 2 steps directly
+        sampler = APMCABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_final_2 = sampler.sample([self.observation], 2, n_sample, n_simulate, alpha=0.9)
+
+        self.assertEqual(journal_final_1.configuration["epsilon_arr"], journal_final_2.configuration["epsilon_arr"])
+        self.assertEqual(journal_final_1.posterior_mean()['mu'], journal_final_2.posterior_mean()['mu'])
 
 
 class RSMCABCTests(unittest.TestCase):
@@ -549,6 +609,26 @@ class RSMCABCTests(unittest.TestCase):
         self.assertLess(sigma_post_mean - 6.49994754262, 10e-2)
 
         self.assertFalse(journal.number_of_simulations == 0)
+
+    def test_restart_from_journal(self):
+        # THIS DOES NOT WORK
+        n_sample, n_simulate = 10, 1
+
+        # 2 steps with intermediate journal:
+        sampler = RSMCABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_intermediate = sampler.sample([self.observation], 1, n_sample, n_simulate)
+        journal_intermediate.save("tmp.jnl")
+        journal_final_1 = sampler.sample([self.observation], 1, n_sample, n_simulate,
+                                         journal_file="tmp.jnl")
+
+        # 2 steps directly
+        sampler = RSMCABC([self.model], [self.dist_calc], self.backend, seed=1)
+        sampler.sample_from_prior(rng=np.random.RandomState(1))
+        journal_final_2 = sampler.sample([self.observation], 2, n_sample, n_simulate)
+
+        self.assertEqual(journal_final_1.configuration["epsilon_arr"], journal_final_2.configuration["epsilon_arr"])
+        self.assertEqual(journal_final_1.posterior_mean()['mu'], journal_final_2.posterior_mean()['mu'])
 
 
 if __name__ == '__main__':
